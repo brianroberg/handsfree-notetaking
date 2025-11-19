@@ -1,0 +1,49 @@
+
+=== Action 1: is.workflow.actions.runworkflow ===
+UUID: F0412815-B1A5-44F4-BE45-8C1505CDA7E2
+WFWorkflowName: Capture Dictated Note Input
+WFWorkflow: {'workflowIdentifier': 'A864E676-628C-4C56-BE9E-81BD8EAD218B', 'workflowName': 'Capture Dictated Note Input', 'isSelf': False}
+
+=== Action 2: is.workflow.actions.date ===
+UUID: 6E47C3DB-C9E2-4E32-A334-97DD587598AE
+
+=== Action 3: is.workflow.actions.format.date ===
+WFDate: {'Value': {'string': '￼', 'attachmentsByRange': {'{0, 1}': {'OutputUUID': '6E47C3DB-C9E2-4E32-A334-97DD587598AE', 'Type': 'ActionOutput', 'OutputName': 'Date'}}}, 'WFSerializationType': 'WFTextTokenString'}
+WFDateFormatStyle: ISO 8601
+UUID: C52BD331-0B98-4335-B2FE-1A1E0C18A8DE
+
+=== Action 4: is.workflow.actions.filter.notes ===
+WFContentItemInputParameter: Library
+AppIntentDescriptor: {'TeamIdentifier': '0000000000', 'BundleIdentifier': 'com.apple.Notes', 'Name': 'Notes', 'AppIntentIdentifier': 'NoteEntity', 'ActionRequiresAppInstallation': True}
+UUID: 521CEF9F-3197-4C32-8C97-B4FCC3CC1D80
+WFContentItemFilter: {'Value': {'WFActionParameterFilterPrefix': 1, 'WFActionParameterFilterTemplates': [{'Operator': 99, 'Values': {'Unit': 4, 'String': {'Value': {'string': '￼', 'attachmentsByRange': {'{0, 1}': {'OutputUUID': 'C52BD331-0B98-4335-B2FE-1A1E0C18A8DE', 'Type': 'ActionOutput', 'OutputName': 'Formatted Date'}}}, 'WFSerializationType': 'WFTextTokenString'}}, 'Removable': True, 'Property': 'Name'}, {'Operator': 4, 'Values': {'Unit': 4, 'Enumeration': {'Value': {'title': {'key': 'Dictated Notes'}, 'subtitle': {'key': 'Dictated Notes'}, 'identifier': 'applenotes:folder/743C1F4C-382E-4269-85DE-E13DB5908C0C'}, 'WFSerializationType': 'WFLinkDynamicOptionSubstitutableState'}}, 'Removable': True, 'Property': 'Folder'}], 'WFContentPredicateBoundedDate': False}, 'WFSerializationType': 'WFContentPredicateTableTemplate'}
+
+=== Action 5: is.workflow.actions.conditional ===
+WFInput: {'Type': 'Variable', 'Variable': {'Value': {'Type': 'ActionOutput', 'OutputName': 'Note', 'OutputUUID': '521CEF9F-3197-4C32-8C97-B4FCC3CC1D80', 'Aggrandizements': [{'Type': 'WFPropertyVariableAggrandizement', 'PropertyName': 'Name'}]}, 'WFSerializationType': 'WFTextTokenAttachment'}}
+WFControlFlowMode: 0
+GroupingIdentifier: AB441B03-57BD-44A8-BEBE-72A8EDCE6DA2
+WFCondition: 100
+
+=== Action 6: is.workflow.actions.appendnote ===
+WFNote: {'Value': {'OutputUUID': '521CEF9F-3197-4C32-8C97-B4FCC3CC1D80', 'Type': 'ActionOutput', 'OutputName': 'Note'}, 'WFSerializationType': 'WFTextTokenAttachment'}
+WFInput: {'Value': {'string': '￼', 'attachmentsByRange': {'{0, 1}': {'OutputUUID': 'F0412815-B1A5-44F4-BE45-8C1505CDA7E2', 'Type': 'ActionOutput', 'OutputName': 'Shortcut Result'}}}, 'WFSerializationType': 'WFTextTokenString'}
+AppIntentDescriptor: {'TeamIdentifier': '0000000000', 'BundleIdentifier': 'com.apple.mobilenotes', 'Name': 'Notes', 'AppIntentIdentifier': 'AppendToNoteLinkAction'}
+UUID: FB6B2BC9-CD26-4805-82B8-C6130F9DE676
+
+=== Action 7: is.workflow.actions.conditional ===
+GroupingIdentifier: AB441B03-57BD-44A8-BEBE-72A8EDCE6DA2
+WFControlFlowMode: 1
+
+=== Action 8: com.apple.mobilenotes.SharingExtension ===
+folder: {'title': {'key': 'Dictated Notes'}, 'symbol': {'systemName': 'folder'}, 'identifier': 'applenotes:folder/743C1F4C-382E-4269-85DE-E13DB5908C0C', 'subtitle': {'key': 'Dictated Notes'}}
+OpenWhenRun: True
+UUID: 1705FBDE-8144-4494-9928-7FF42B5A4FCD
+AppIntentDescriptor: {'TeamIdentifier': '0000000000', 'BundleIdentifier': 'com.apple.mobilenotes', 'Name': 'Notes', 'AppIntentIdentifier': 'CreateNoteLinkAction'}
+WFCreateNoteInput: {'Value': {'string': '￼', 'attachmentsByRange': {'{0, 1}': {'OutputUUID': 'F0412815-B1A5-44F4-BE45-8C1505CDA7E2', 'Type': 'ActionOutput', 'OutputName': 'Shortcut Result'}}}, 'WFSerializationType': 'WFTextTokenString'}
+WFNoteGroup: {'Identifier': 'applenotes:folder/743C1F4C-382E-4269-85DE-E13DB5908C0C', 'DisplayString': 'Dictated Notes'}
+name: {'Value': {'string': '￼', 'attachmentsByRange': {'{0, 1}': {'OutputUUID': 'C52BD331-0B98-4335-B2FE-1A1E0C18A8DE', 'Type': 'ActionOutput', 'OutputName': 'Formatted Date'}}}, 'WFSerializationType': 'WFTextTokenString'}
+
+=== Action 9: is.workflow.actions.conditional ===
+UUID: A544085A-F0DB-4DB0-ADDB-F84EE7D45941
+GroupingIdentifier: AB441B03-57BD-44A8-BEBE-72A8EDCE6DA2
+WFControlFlowMode: 2

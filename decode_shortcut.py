@@ -19,8 +19,13 @@ import plistlib
 import sys
 from pathlib import Path
 
-# Pure-Python ASN.1 library (builtin in this environment)
+# Pure-Python ASN.1 library (installed via pip)
 from asn1crypto import cms
+
+try:
+    import lzfse
+except ModuleNotFoundError:  # pragma: no cover - dependency hint for users
+    lzfse = None
 
 
 def extract_cms_payload(shortcut_path: Path) -> bytes:
@@ -40,6 +45,44 @@ def extract_cms_payload(shortcut_path: Path) -> bytes:
         raise ValueError("Shortcut contains no embedded plist content")
 
     return encap['content'].native
+
+
+def extract_aea1_lzfse_payload(shortcut_path: Path) -> bytes:
+    """
+    Extract the inner plist payload from Apple's newer AEA1 container that
+    wraps an LZFSE-compressed plist.
+    """
+    if lzfse is None:
+        raise ValueError("Missing dependency: install lzfse to parse AEA1 shortcuts")
+
+    data = shortcut_path.read_bytes()
+
+    if not data.startswith(b"AEA1"):
+        raise ValueError("Not an AEA1/LZFSE shortcut")
+
+    # First 4 bytes: magic "AEA1"
+    # Next 4 bytes: unused/reserved (currently zeros)
+    # Next 4 bytes: little-endian length of the signing certificate plist
+    cert_len = int.from_bytes(data[8:12], "little")
+
+    # The certificate chain plist is rarely useful for decoding, but we skip
+    # past it to reach the payload section.
+    payload_start = 12 + cert_len
+
+    # The actual workflow payload is stored in an LZFSE-compressed block
+    # flagged by the "bvx" magic. Grab from that magic onward.
+    magic_index = data.find(b"bvx", payload_start)
+    if magic_index == -1:
+        raise ValueError("LZFSE section not found inside AEA1 container")
+
+    compressed = data[magic_index:]
+    decompressed = lzfse.decompress(compressed)
+
+    plist_index = decompressed.find(b"bplist00")
+    if plist_index == -1:
+        raise ValueError("Embedded plist not found after decompressing AEA1 payload")
+
+    return decompressed[plist_index:]
 
 
 def decode_plist_to_dict(plist_bytes: bytes) -> dict:
@@ -84,8 +127,11 @@ def process_shortcut(path: Path, do_xml: bool, do_actions: bool):
     try:
         payload = extract_cms_payload(path)
     except Exception as e:
-        print(f"ERROR: Failed to extract CMS content: {e}")
-        return
+        try:
+            payload = extract_aea1_lzfse_payload(path)
+        except Exception as e2:
+            print(f"ERROR: Failed to extract shortcut payload.\n- CMS parse error: {e}\n- AEA1 parse error: {e2}")
+            return
 
     try:
         plist_dict = decode_plist_to_dict(payload)
